@@ -10,7 +10,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.finalprojectdu.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -195,6 +199,27 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.signOut){
+            mAuth.signOut();
+            startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
 
