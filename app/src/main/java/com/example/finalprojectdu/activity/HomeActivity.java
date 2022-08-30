@@ -286,13 +286,9 @@ public class HomeActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     for (DataSnapshot npsnapshot : snapshot.getChildren()){
                         Report l = npsnapshot.getValue(Report.class);
-
                         //IF Else Time
                         reportList.add(l);
-
                         getPermission(l.getLat(), l.getLan(), l.getRoadCondition());
-                        Toast.makeText(HomeActivity.this, l.getName(), Toast.LENGTH_SHORT).show();
-                        Toast.makeText(HomeActivity.this, l.getLan()+"", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
