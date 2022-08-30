@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -40,6 +41,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
     private ImageView profileImage;
     private Uri imageUri;
 
+    TextView bloodTV;
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
     private StorageReference userProfileImageRef;
@@ -58,6 +60,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
         profileImage = findViewById(R.id.profile_image);
         phone = findViewById(R.id.phone_id);
         loadingBar = new ProgressDialog(this);
+        bloodTV = findViewById(R.id.blood_id);
 
         mAuth = FirebaseAuth.getInstance();
         currentUserId = mAuth.getCurrentUser().getUid();
@@ -111,6 +114,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
     private void saveUserInfo() {
         String fullname = fullName.getText().toString().trim();
         String phn = phone.getText().toString().trim();
+        String blood = bloodTV.getText().toString().trim();
 
 
         if (TextUtils.isEmpty(fullname) || TextUtils.isEmpty(phn)){
@@ -127,6 +131,9 @@ public class ProfileSetupActivity extends AppCompatActivity {
             userMap.put("fullName", fullname);
             userMap.put("phone", phn);
             userMap.put("imageUpload", 0);
+            if (blood!=null){
+                userMap.put("blood", blood);
+            }
             userRef.child(mAuth.getUid()).updateChildren(userMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {

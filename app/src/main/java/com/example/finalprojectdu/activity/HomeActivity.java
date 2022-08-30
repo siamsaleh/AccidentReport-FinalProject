@@ -131,14 +131,13 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // Emergency Button
-
-//        findViewById(R.id.btEmergency).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
-//            }
-//        });
+        // Accident Button
+        findViewById(R.id.btEmergency).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), AccidentActivity.class));
+            }
+        });
 
         // daily Upload Button
         findViewById(R.id.btDailyUpload).setOnClickListener(new View.OnClickListener() {
