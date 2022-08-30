@@ -38,6 +38,7 @@ public class SignUpActivity extends AppCompatActivity {
         loginActivity = findViewById(R.id.txt_login);
         loadingBar = new ProgressDialog(this);
 
+        //Firebase
         mAuth = FirebaseAuth.getInstance();
 
         createAccount.setOnClickListener(new View.OnClickListener() {

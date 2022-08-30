@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.ReportActivity"
+    tools:context=".activity.AccidentActivity"
     android:background="@color/white"
     >
+
+<!--    Accident report-->
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -14,6 +16,7 @@
         android:layout_height="56dp"
         android:layout_alignParentTop="true"
         android:background="@drawable/gradient_back">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -26,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="@font/poppins_regular"
-                android:text="Report"
+                android:text="Accident Report"
                 android:textAlignment="center"
                 android:textColor="@color/background_white"
                 android:textSize="25sp" />
@@ -68,7 +71,6 @@
         android:textSize="15sp" />
 
     <EditText
-        android:visibility="gone"
         android:id="@+id/etInvolvedVehicle"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -92,7 +94,7 @@
     <EditText
         android:id="@+id/etRoadCondition"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="50dp"
         android:layout_below="@id/etInvolvedVehicle"
         android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"

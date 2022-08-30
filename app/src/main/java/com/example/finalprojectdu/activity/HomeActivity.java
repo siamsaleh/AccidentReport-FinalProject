@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.finalprojectdu.R;
+import com.example.finalprojectdu.adapter.ReportAdapter;
+import com.example.finalprojectdu.model.Report;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,15 +43,24 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HomeActivity extends AppCompatActivity {
 
     // Initialize Google Map
     SupportMapFragment smf;
+    double lat, lan;
     FusedLocationProviderClient client;
 
     //Initialize Database
     private FirebaseAuth mAuth;
     private DatabaseReference bokRef, userRef;
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference reportRef;
+
+    private List<Report> reportList;
+
     public static int UPLOAD_IMAGES = -1;
 
     @Override
@@ -57,11 +68,16 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
+
+
         //Initialize Database
         databaseInitialization();
 
         // Google Map
         showingMap();
+        lat = 0.0;
+        lan = 0.0;
 
         //Button Press
         onClick();
@@ -111,7 +127,7 @@ public class HomeActivity extends AppCompatActivity {
         findViewById(R.id.btReport).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), ReportActivity.class));
+                startActivity(new Intent(getApplicationContext(), ReportActivity.class).putExtra("lat", lat).putExtra("lan", lan));
             }
         });
 
@@ -131,6 +147,7 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), DailyUploadActivity.class));
             }
         });
+
     }
 
     // Location Permission
@@ -153,10 +170,60 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onMapReady(@NonNull GoogleMap googleMap) {
                         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                        lat = location.getLatitude();
+                        lan = location.getLongitude();
                         MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("You are Here!!");
 
+
+//                        for (int i = 0; i < reportList.size(); i++) {
+//                            LatLng latLngTemp = new LatLng(reportList.get(i).getLat(), reportList.get(i).getLan());
+//                            MarkerOptions markerOptionsTemp = new MarkerOptions().position(latLngTemp).title(reportList.get(i).getRoadCondition());
+//                            googleMap.addMarker(markerOptionsTemp);
+//                        }
+
+
+                        //LatLng latLng2 = new LatLng(23.777176, 90.399452);
+                        //MarkerOptions markerOptions2 = new MarkerOptions().position(latLng2).title("You are There!!");
+
                         googleMap.addMarker(markerOptions);
+                        //googleMap.addMarker(markerOptions2);
                         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                    }
+                });
+            }
+        });
+    }
+
+    private void getPermission(double lat, double lan, String roadCondition) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Task<Location> task = client.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                smf.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(@NonNull GoogleMap googleMap) {
+                        LatLng latLng = new LatLng(lat, lan);
+
+                        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(roadCondition);
+
+//                        for (int i = 0; i < reportList.size(); i++) {
+//                            LatLng latLngTemp = new LatLng(reportList.get(i).getLat(), reportList.get(i).getLan());
+//                            MarkerOptions markerOptionsTemp = new MarkerOptions().position(latLngTemp).title(reportList.get(i).getRoadCondition());
+//                            googleMap.addMarker(markerOptionsTemp);
+//                        }
+
+                        googleMap.addMarker(markerOptions);
+                        //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
                     }
                 });
             }
@@ -192,6 +259,9 @@ public class HomeActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
+                else {
+                    getReports();
+                }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -201,6 +271,45 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //   Get Reports
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void getReports(){
+        firebaseDatabase = FirebaseDatabase.getInstance("https://finalproject-d876c-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        reportRef = firebaseDatabase.getReference("Reports");
+
+        reportList = new ArrayList<>();
+        reportRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for (DataSnapshot npsnapshot : snapshot.getChildren()){
+                        Report l = npsnapshot.getValue(Report.class);
+
+                        //IF Else Time
+                        reportList.add(l);
+
+                        getPermission(l.getLat(), l.getLan(), l.getRoadCondition());
+                        Toast.makeText(HomeActivity.this, l.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HomeActivity.this, l.getLan()+"", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //   Menu (Sign Out)
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 

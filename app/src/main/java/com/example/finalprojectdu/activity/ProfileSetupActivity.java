@@ -112,6 +112,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
         String fullname = fullName.getText().toString().trim();
         String phn = phone.getText().toString().trim();
 
+
         if (TextUtils.isEmpty(fullname) || TextUtils.isEmpty(phn)){
             Toast.makeText(this, "Fill Up All", Toast.LENGTH_SHORT).show();
         }else{
