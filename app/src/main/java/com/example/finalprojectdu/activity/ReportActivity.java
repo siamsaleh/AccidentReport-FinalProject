@@ -134,7 +134,7 @@ public class ReportActivity extends AppCompatActivity {
             userMap.put("date", date);
             userMap.put("roadCondition", roadCondition);
             userMap.put("uid", uid);
-            userMap.put("name", roadCondition);
+            userMap.put("name", name);
             userMap.put("phone", roadCondition);
 
             reportRef.child(KEY).updateChildren(userMap).addOnCompleteListener(new OnCompleteListener() {
