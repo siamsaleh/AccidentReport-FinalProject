@@ -59,7 +59,7 @@ public class DailyUploadActivity extends AppCompatActivity {
 
         //report RecyclerView
         reportRecyclerView = findViewById(R.id.report_recyclerview);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         reportRecyclerView.setLayoutManager(layoutManager);
         reportList = new ArrayList<>();
         //getting report from firebase

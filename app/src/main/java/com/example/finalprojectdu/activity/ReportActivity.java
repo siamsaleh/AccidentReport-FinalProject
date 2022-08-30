@@ -109,12 +109,18 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void saveUserInfo() {
+
         String roadCondition = etRoadCondition.getText().toString().trim();
         String time = etTime.getText().toString().trim();
         String date = etDate.getText().toString().trim();
         String name = "Saleh Ahmed Siam";
         String phone = "01686768903";
         String uid = FirebaseAuth.getInstance().getUid();
+
+        String location = etLocation.getText().toString().trim();
+        String[] arrOfStr = location.split(",");
+        double lat = Double.parseDouble(arrOfStr[0]);
+        double lan = Double.parseDouble(arrOfStr[1]);
 
         if (TextUtils.isEmpty(roadCondition) || TextUtils.isEmpty(time) || TextUtils.isEmpty(date)){
             Toast.makeText(this, "Fill Up All", Toast.LENGTH_SHORT).show();
