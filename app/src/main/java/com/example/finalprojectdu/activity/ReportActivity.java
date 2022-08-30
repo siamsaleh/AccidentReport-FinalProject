@@ -23,8 +23,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -33,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ReportActivity extends AppCompatActivity {
@@ -57,6 +61,9 @@ public class ReportActivity extends AppCompatActivity {
     final static int GALLERY_PICK = 1;
 
     double lat, lan;
+
+    String userName = "";
+    String userPhone = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +120,8 @@ public class ReportActivity extends AppCompatActivity {
         String roadCondition = etRoadCondition.getText().toString().trim();
         String time = etTime.getText().toString().trim();
         String date = etDate.getText().toString().trim();
-        String name = "Saleh Ahmed Siam";
-        String phone = "01686768903";
+        String name = userName;
+        String phone = userPhone;
         String uid = FirebaseAuth.getInstance().getUid();
 
         String location = etLocation.getText().toString().trim();
@@ -135,7 +142,8 @@ public class ReportActivity extends AppCompatActivity {
             userMap.put("roadCondition", roadCondition);
             userMap.put("uid", uid);
             userMap.put("name", name);
-            userMap.put("phone", roadCondition);
+            userMap.put("phone", phone);
+            userMap.put("image", roadImageUri);
 
             reportRef.child(KEY).updateChildren(userMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
@@ -217,5 +225,47 @@ public class ReportActivity extends AppCompatActivity {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss a");
         String formattedTime = simpleDateFormat.format(c);
         return formattedTime;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getUserData();
+    }
+
+    public void getUserData(){
+        FirebaseAuth mAuth;
+        DatabaseReference userRef;
+        StorageReference userProfileImageRef;
+
+        mAuth = FirebaseAuth.getInstance();
+        userRef = FirebaseDatabase.getInstance("https://finalproject-d876c-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference().child("Users");
+        userProfileImageRef = FirebaseStorage.getInstance().getReference().child("profile images");
+
+        userRef.child(Objects.requireNonNull(mAuth.getUid())).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+//                    String image = snapshot.child("profileImage").getValue().toString();
+                    if (snapshot.hasChild("fullName")) {
+                        String name = snapshot.child("fullName").getValue().toString();
+                        userName = name;
+                    }
+                    if (snapshot.hasChild("phone")) {
+                        String phone1 = snapshot.child("phone").getValue().toString();
+                        userPhone = phone1;
+                    }
+
+
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
     }
 }

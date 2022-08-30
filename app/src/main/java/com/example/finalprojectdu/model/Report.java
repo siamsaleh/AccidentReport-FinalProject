@@ -3,13 +3,13 @@ package com.example.finalprojectdu.model;
 import java.io.Serializable;
 
 public class Report implements Serializable {
-    String time, date, roadCondition, name, phone, uid;
+    String time, date, roadCondition, name, phone, uid, image;
     double lat, lan;
 
     public Report() {
     }
 
-    public Report(String time, String date, String roadCondition, String name, String phone, String uid, double lat, double lan) {
+    public Report(String time, String date, String roadCondition, String name, String phone, String uid, double lat, double lan, String image) {
         this.time = time;
         this.date = date;
         this.roadCondition = roadCondition;
@@ -18,6 +18,15 @@ public class Report implements Serializable {
         this.uid = uid;
         this.lan = lan;
         this.lat = lat;
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public double getLat() {
