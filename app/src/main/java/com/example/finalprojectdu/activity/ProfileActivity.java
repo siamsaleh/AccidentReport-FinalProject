@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -22,7 +23,7 @@ import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView fullName, phone;
+    private TextView fullName, phone, bloodtxt;
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
     private StorageReference userProfileImageRef;
@@ -34,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         fullName = findViewById(R.id.name_id);
         phone = findViewById(R.id.phone_id);
+        bloodtxt = findViewById(R.id.blood_id);
 
         mAuth = FirebaseAuth.getInstance();
         userRef = FirebaseDatabase.getInstance("https://finalproject-d876c-default-rtdb.asia-southeast1.firebasedatabase.app/").getReference().child("Users");
@@ -51,6 +53,13 @@ public class ProfileActivity extends AppCompatActivity {
                     if (snapshot.hasChild("phone")) {
                         String phone1 = snapshot.child("phone").getValue().toString();
                         phone.setText(phone1);
+                    }
+
+                    if (snapshot.hasChild("blood")) {
+                        String phone1 = snapshot.child("blood").getValue().toString();
+                        bloodtxt.setText(phone1);
+                    }else {
+                        bloodtxt.setVisibility(View.INVISIBLE);
                     }
 
 

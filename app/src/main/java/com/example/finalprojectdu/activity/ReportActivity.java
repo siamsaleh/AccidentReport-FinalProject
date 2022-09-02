@@ -199,7 +199,6 @@ public class ReportActivity extends AppCompatActivity {
                                 //Firebase image location uri
                                 roadImageUri = uri.toString();
                                 loadingBar.dismiss();
-                                Toast.makeText(ReportActivity.this, roadImageUri, Toast.LENGTH_SHORT).show();
                             }
                         });
 

@@ -135,7 +135,7 @@ public class HomeActivity extends AppCompatActivity {
         findViewById(R.id.btEmergency).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), AccidentActivity.class));
+                startActivity(new Intent(getApplicationContext(), AccidentActivity.class).putExtra("lat", lat).putExtra("lan", lan));
             }
         });
 

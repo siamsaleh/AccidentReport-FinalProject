@@ -38,7 +38,7 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
     @Override
     public void onBindViewHolder(@NonNull ReportAdapter.ReportViewHolder holder, int position) {
         holder.name.setText(reportsList.get(position).getName());
-        holder.time.setText(reportsList.get(position).getTime());
+        holder.time.setText(reportsList.get(position).getTime() + " " + reportsList.get(position).getDate());
         holder.info.setText(reportsList.get(position).getRoadCondition());
         if (reportsList.get(position).getImage()!=null) {
             holder.imageView.setVisibility(View.VISIBLE);
