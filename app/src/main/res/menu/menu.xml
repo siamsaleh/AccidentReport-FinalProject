@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/reload"
+        android:title="Reload"
+        android:icon="@drawable/baseline_refresh_24"
+        app:showAsAction="always"
+        />
+
     <item android:id="@+id/signOut"
         android:title="Sign Out"
         android:icon="@drawable/baseline_logout_24"

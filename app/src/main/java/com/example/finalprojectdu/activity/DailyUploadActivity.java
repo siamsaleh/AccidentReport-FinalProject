@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.finalprojectdu.R;
 import com.example.finalprojectdu.adapter.ReportAdapter;
@@ -23,14 +24,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class DailyUploadActivity extends AppCompatActivity {
 
     //Report RecyclerView /
     private RecyclerView reportRecyclerView;
-    private List<Report> reportList;
+    private List<Report> reportList; 
     private ReportAdapter reportAdapter;
 
     //Initialize Variables
@@ -71,7 +76,11 @@ public class DailyUploadActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     for (DataSnapshot npsnapshot : snapshot.getChildren()){
                         Report l = npsnapshot.getValue(Report.class);
-                        reportList.add(l);
+
+                        String date = getCurrentDate();
+
+                        if (date.equals(l.getDate()))
+                            reportList.add(l);
 
                         //Progress Bar
                         if (progressBar.getVisibility() == View.VISIBLE) {
@@ -88,11 +97,29 @@ public class DailyUploadActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
 
 
+//    private String substractDates(Date date1, Date date2, SimpleDateFormat format) {
+//        long restDatesinMillis = date1.getTime()-date2.getTime();
+//        Date restdate = new Date(restDatesinMillis);
+//
+//        return format.format(restdate);
+//    }
+
+    public static String getCurrentDate(){
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        String formattedDate = simpleDateFormat.format(c);
+        return formattedDate;
+    }
+
+    public static String getCurrentTime(){
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss a");
+        String formattedTime = simpleDateFormat.format(c);
+        return formattedTime;
+    }
 
     //For Back Button
     @Override

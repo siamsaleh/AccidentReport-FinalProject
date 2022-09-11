@@ -2,6 +2,7 @@ package com.example.finalprojectdu.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -63,12 +64,16 @@ public class HomeActivity extends AppCompatActivity {
 
     public static int UPLOAD_IMAGES = -1;
 
+    Bundle savedInstanceState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.savedInstanceState = savedInstanceState;
         setContentView(R.layout.activity_home);
-
-
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         //Initialize Database
@@ -302,6 +307,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //   Menu (Sign Out)
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -320,6 +326,11 @@ public class HomeActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.signOut){
             mAuth.signOut();
             startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+            return true;
+        }
+
+        if (item.getItemId() == R.id.reload){
+            showingMap();
             return true;
         }
 
