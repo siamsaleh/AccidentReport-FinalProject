@@ -3,12 +3,22 @@ package com.example.finalprojectdu.activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.finalprojectdu.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +43,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,6 +53,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class ReportActivity extends AppCompatActivity {
+
+    private static final int CAMERA_PICK = 2;
+    private static final int CAMERA_PERMISSION_CODE = 101;
+    String currentPhotoPath;
 
     //Initialize variables
     private EditText etLocation, etRoadCondition, etTime, etDate;
@@ -98,10 +115,72 @@ public class ReportActivity extends AppCompatActivity {
         roadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GALLERY_PICK);
+
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ReportActivity.this);
+
+                // set title
+                alertDialogBuilder.setTitle("Note !");
+
+                // set dialog message
+                alertDialogBuilder
+                        .setMessage("Want to sent photo with camera or gallery?")
+                        .setCancelable(false)
+                        .setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent galleryIntent = new Intent();
+                                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                                galleryIntent.setType("image/*");
+                                startActivityForResult(galleryIntent, GALLERY_PICK);
+                            }
+                        })
+                        .setNegativeButton("Camera",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                askCameraPermission();
+                            }
+                        })
+                        .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+
+                // create alert dialog
+                AlertDialog alertDialog = alertDialogBuilder.create();
+
+                // show it
+                alertDialog.show();
+
+
+
+
+
+
+
+//                AlertDialog alertDialog = new AlertDialog.Builder(getApplicationContext())
+//                        .setIcon(android.R.drawable.ic_dialog_alert)
+//                        //set title
+//                        .setTitle("Note")
+//                        //set message
+//                        .setMessage("Want to sent photo with camera or gallery?")
+//                        //set positive button
+//                        .setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                Intent galleryIntent = new Intent();
+//                                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+//                                galleryIntent.setType("image/*");
+//                                startActivityForResult(galleryIntent, GALLERY_PICK);
+//                            }
+//                        })
+//                        .setNegativeButton("Camera", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                askCameraPermission();
+//                            }
+//                        })
+//                        .show();
             }
         });
 
@@ -113,6 +192,55 @@ public class ReportActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void askCameraPermission(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+        }else {
+            dispatchTakePictureIntent();
+        }
+    }
+
+    //Image File Creation
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES); //It save in private, not showing in gallery
+        //File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES); //You
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.finalprojectdu.android.fileprovider",//It may conflict for many app in phone(Menifest Profider)
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_PICK);
+            }
+        }
     }
 
     private void saveUserInfo() {
@@ -209,7 +337,76 @@ public class ReportActivity extends AppCompatActivity {
                 }
             });
         }
+
+
+        //Camera Image Pick
+        if (requestCode == CAMERA_PICK && resultCode == RESULT_OK){
+            File file = new File(currentPhotoPath);
+            roadImage.setImageURI(Uri.fromFile(file));
+            Log.d("EASY_MAIN", "onActivityResult: Url " + Uri.fromFile(file));
+
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            Uri contentUri = Uri.fromFile(file);
+            mediaScanIntent.setData(contentUri);
+            this.sendBroadcast(mediaScanIntent);
+
+
+
+            //uploadImageToFirebase(file.getName(), contentUri);
+
+            loadingBar.setTitle("Report Image");
+            loadingBar.setMessage("Please wait, while we updating your report image...");
+            loadingBar.show();
+
+            final StorageReference filepath = roadImageRef.child(KEY+".jpg");
+
+            filepath.putFile(contentUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()){
+
+                        //get Image Uri
+                        filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                //get Image Uri
+                                roadImage.setImageURI(contentUri);
+                                //Firebase image location uri
+                                roadImageUri = uri.toString();
+                                loadingBar.dismiss();
+                            }
+                        });
+
+                    }else{
+                        loadingBar.dismiss();
+                        Toast.makeText(ReportActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+        }
     }
+
+//    private void uploadImageToFirebase(String name, Uri contentUri) {
+//        StorageReference image = storageReference.child("Product images/" + mAuth.getUid() + "/" + name);
+//        image.putFile(contentUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//            @Override
+//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                image.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                    @Override
+//                    public void onSuccess(Uri uri) {
+//                        productImageLink = uri.toString();
+//                        Log.d("EASY_HAND", "onSuccess: " + uri.toString());
+//                    }
+//                });
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Log.d("EASY_HAND", "onFailure: " + e.getMessage());
+//            }
+//        });
+//    }
 
 
     public static String getCurrentDate(){
