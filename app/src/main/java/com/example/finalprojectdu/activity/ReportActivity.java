@@ -128,6 +128,7 @@ public class ReportActivity extends AppCompatActivity {
                         .setCancelable(false)
                         .setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                //open gallery
                                 Intent galleryIntent = new Intent();
                                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                                 galleryIntent.setType("image/*");
@@ -136,6 +137,7 @@ public class ReportActivity extends AppCompatActivity {
                         })
                         .setNegativeButton("Camera",new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                //open camera
                                 askCameraPermission();
                             }
                         })
@@ -303,6 +305,7 @@ public class ReportActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         //Image 0
+        //Gallery
         if (requestCode == GALLERY_PICK && resultCode == RESULT_OK && data!=null ){
 
             Uri imageUri = data.getData();
