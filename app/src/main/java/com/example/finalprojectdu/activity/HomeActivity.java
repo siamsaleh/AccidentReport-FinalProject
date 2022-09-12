@@ -44,7 +44,10 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
@@ -292,8 +295,11 @@ public class HomeActivity extends AppCompatActivity {
                     for (DataSnapshot npsnapshot : snapshot.getChildren()){
                         Report l = npsnapshot.getValue(Report.class);
                         //IF Else Time
-                        reportList.add(l);
-                        getPermission(l.getLat(), l.getLan(), l.getRoadCondition());
+                        String date = getCurrentDate();
+                        if (date.equals(l.getDate())) {
+                            reportList.add(l);
+                            getPermission(l.getLat(), l.getLan(), l.getRoadCondition());
+                        }
                     }
                 }
             }
@@ -303,6 +309,13 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public static String getCurrentDate(){
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        String formattedDate = simpleDateFormat.format(c);
+        return formattedDate;
     }
 
 
