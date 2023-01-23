@@ -2,6 +2,8 @@
 
 Apk Link - https://drive.google.com/drive/u/1/folders/1KoBqhOi8KLU6n_S_836smsCqYJx69S4X
 
+Features  - Home, Reports, Daily Uploads, Accident Reports
+
 # Home
 
 In home page we can see all blocked roads updated by the app users.
